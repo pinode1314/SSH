@@ -282,7 +282,6 @@ sshkey_panel() {
         IS_KEY_ENABLED="${gl_hui}未启用${gl_bai}"
     fi
     echo -e "用户密钥登录模式 ${IS_KEY_ENABLED}"
-    echo "进阶玩法: https://blog.kejilion.pro/ssh-key"
     echo "------------------------------------------------"
     echo "将会生成密钥对，更安全的方式SSH登录"
     echo "------------------------"
