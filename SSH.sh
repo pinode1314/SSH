@@ -336,7 +336,7 @@ sshkey_panel() {
 while true; do
     echo ""
     echo -e "${SKYBLUE}==================================================${NC}"
-    echo -e "${SKYBLUE}          📊 Linux 系统信息与工具面板         ${NC}"
+    echo -e "${SKYBLUE}          Linux 系统信息与工具面板         ${NC}"
     echo -e "${SKYBLUE}==================================================${NC}"
     echo " 1. 查看系统版本,硬件,IP等信息"
     echo " 2. 修改系统用户密码"
