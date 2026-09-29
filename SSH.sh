@@ -202,7 +202,7 @@ sshkey_on() {
 
     /usr/sbin/sshd -t
     restart_ssh
-    echo -e "${gl_lv}用户密钥登录模式已开启，已关闭密码登录模式，重连将会生效${gl_bai}"
+    echo -e "${gl_lv}已启用密钥登录，已关闭密码登录模式，重连将会生效${gl_bai}"
     show_ssh_real_status
 }
 
@@ -234,7 +234,7 @@ clean_old_sshkeys() {
 
 add_sshpasswd() {
     send_stats "设置密码登录模式"
-    echo "设置密码登录模式"
+    echo "开启root密码SSH登录模式"
     local target_user="$1"
     if [[ -z "$target_user" ]]; then
         read -e -p "请输入要修改密码的用户名（默认 root）: " target_user
@@ -274,13 +274,13 @@ EOF
     fi
 
     restart_ssh
-    echo -e "${gl_lv}密码设置完毕，已更改为密码登录模式！${gl_bai}"
+    echo -e "${gl_lv}密码设置完毕，已启用密码登录模式！${gl_bai}"
     show_ssh_real_status
     echo -e "${YELLOW}⚠️云服务器提醒：如控制台绑定SSH密钥，重启实例仍可能被cloud‑init重置配置${NC}"
 }
 
 sshkey_panel() {
-  send_stats "用户密钥登录"
+  send_stats "SSH密钥与密码登录管理"
   while true; do
     clear
     local REAL_STATUS=$(grep -i "^PubkeyAuthentication" /etc/ssh/sshd_config 2>/dev/null | tr '[:upper:]' '[:lower:]')
@@ -289,14 +289,14 @@ sshkey_panel() {
     else
         IS_KEY_ENABLED="${gl_hui}未启用${gl_bai}"
     fi
-    echo -e "用户密钥登录模式 ${IS_KEY_ENABLED}"
+    echo -e "SSH密钥登录状态 ${IS_KEY_ENABLED}"
     echo "------------------------------------------------"
-    echo "将会生成密钥对，更安全的方式SSH登录"
+    echo "SSH密钥与密码登录管理子菜单"
     echo "------------------------"
-    echo "1. 生成新密钥对"
-    echo "2. 查看本机密钥"
-    echo "3. 清理旧公钥,保留最新公钥（旧公钥失效无法再登录）"
-    echo "4. 恢复/设置密码登录模式"
+    echo "1. 生成ED25519密钥对"
+    echo "2. 查看本机SSH密钥"
+    echo "3. 清理旧公钥，仅保留最新公钥"
+    echo "4. 开启root密码SSH登录（兼容云服务器cloud‑init）"
     echo "------------------------"
     echo "0. 返回上一级选单"
     echo "------------------------"
@@ -347,7 +347,7 @@ while true; do
     echo -e "${SKYBLUE}==================================================${NC}"
     echo " 1. 查看系统版本,硬件,IP等信息"
     echo " 2. 修改系统用户密码"
-    echo " 3. 开启密钥/密码登录模式"
+    echo " 3. SSH密钥与密码登录管理"
     echo " 0. 退出脚本"
     echo -e "${SKYBLUE}==================================================${NC}"
     read -p "请选择操作 [0-3]: " CHOICE
