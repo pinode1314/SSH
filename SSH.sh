@@ -168,7 +168,15 @@ break_end() {
 }
 
 ip_address() {
-    ipv4_address=$(curl -s 4.ip.sb || hostname -I | awk '{print $1}')
+    #多接口轮询获取公网IPv4
+    ipv4_address=$(curl -s --max-time 3 https://api.ip.sb/ip)
+    if [[ -z "$ipv4_address" ]];then
+        ipv4_address=$(curl -s --max-time 3 https://ifconfig.me/ip)
+    fi
+    if [[ -z "$ipv4_address" ]];then
+        ipv4_address=$(curl -s --max-time 3 https://ipinfo.io/ip)
+    fi
+    ipv4_address=$(echo "$ipv4_address" | xargs)
 }
 
 restart_ssh() {
@@ -331,7 +339,6 @@ sshkey_panel() {
         0)
             echo "正在返回主菜单..."
             SKIP_PAUSE=1
-            sleep 0.3
             break
             ;;
         *)
@@ -340,7 +347,6 @@ sshkey_panel() {
             ;;
     esac
   done
-  # 将标记传回主循环
   return $SKIP_PAUSE
 }
 
@@ -369,7 +375,6 @@ while true; do
             ;;
     esac
 
-    # 如果标记为1，跳过按任意键继续
     if [ "$SKIP_WAIT" -ne 1 ]; then
         echo ""
         read -p "按任意键继续..."
