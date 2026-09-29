@@ -226,7 +226,7 @@ clean_old_sshkeys() {
     if [[ -f "${HOME}/.ssh/sshkey.pub" ]]; then
         cat "${HOME}/.ssh/sshkey.pub" > "${HOME}/.ssh/authorized_keys"
         chmod 600 "${HOME}/.ssh/authorized_keys"
-        echo -e "${gl_lv}清理成功！已清除所有旧公钥，现在只保留了最新生成的公钥。${gl_bai}"
+        echo -e "${gl_lv}清理成功！已清除所有旧公钥，现在只保留了最新的公钥。${gl_bai}"
     else
         echo -e "${gl_hong}错误：未找到本地的 sshkey.pub 文件，请先生成新密钥对。${gl_bai}"
     fi
@@ -281,6 +281,7 @@ EOF
 
 sshkey_panel() {
   send_stats "SSH密钥与密码登录管理"
+  SKIP_PAUSE=0
   while true; do
     clear
     local REAL_STATUS=$(grep -i "^PubkeyAuthentication" /etc/ssh/sshd_config 2>/dev/null | tr '[:upper:]' '[:lower:]')
@@ -329,7 +330,8 @@ sshkey_panel() {
             ;;
         0)
             echo "正在返回主菜单..."
-            sleep 1
+            SKIP_PAUSE=1
+            sleep 0.3
             break
             ;;
         *)
@@ -338,6 +340,8 @@ sshkey_panel() {
             ;;
     esac
   done
+  # 将标记传回主循环
+  return $SKIP_PAUSE
 }
 
 while true; do
@@ -351,10 +355,11 @@ while true; do
     echo " 0. 退出脚本"
     echo -e "${SKYBLUE}==================================================${NC}"
     read -p "请选择操作 [0-3]: " CHOICE
+    SKIP_WAIT=0
     case "$CHOICE" in
         1) show_system_status ;;
         2) change_user_password ;;
-        3) sshkey_panel ;;
+        3) sshkey_panel; SKIP_WAIT=$? ;;
         0)
             echo -e "${GREEN}已安全退出脚本。${NC}"
             break
@@ -364,6 +369,9 @@ while true; do
             ;;
     esac
 
-    echo ""
-    read -p "按任意键继续..."
+    # 如果标记为1，跳过按任意键继续
+    if [ "$SKIP_WAIT" -ne 1 ]; then
+        echo ""
+        read -p "按任意键继续..."
+    fi
 done
